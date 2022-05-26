@@ -29,7 +29,7 @@ jobs:
           )
 
           already_merging=$(echo $open_prs | \
-            jq 'any(.labels | contains(["ci-internal:merge"])) \
+            jq 'any(.labels | contains(["ci-internal:merge"]))' \
           )
 
           if [ "$already_merging" = "true" ]; then
