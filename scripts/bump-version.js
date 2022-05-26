@@ -20,7 +20,7 @@ async function main() {
       path.relative(monorepoRootPath, packageInfo.location),
       newVersions,
       {
-        fromRef: 'main',
+        fromRef: 'remotes/origin/main',
         toRef: 'HEAD',
       }
     );
