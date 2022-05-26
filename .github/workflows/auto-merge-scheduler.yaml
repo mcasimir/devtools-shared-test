@@ -1,9 +1,10 @@
 name: Mark Pull Requests for merge
 
 on:
-  # Every 2 minutes
+  # Every 5 minutes
+  # this is the shortest interval allowed by github
   schedule:
-    - cron: "*/2 * * * *"
+    - cron: "*/5 * * * *"
 
 jobs:
   main:
