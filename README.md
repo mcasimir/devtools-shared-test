@@ -8,13 +8,13 @@ To start working:
 npm run bootstrap
 ```
 
-Lint code and dependencies
+Lint code and dependencies:
 
 ```
 npm run check
 ```
 
-Run tests
+Run tests:
 
 ```
 npm run test
