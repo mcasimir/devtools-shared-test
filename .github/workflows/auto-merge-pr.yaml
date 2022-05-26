@@ -67,7 +67,7 @@ jobs:
           PULL_REQUEST_NUMBER: ${{github.event.pull_request.number}}
           GITHUB_TOKEN: ${{secrets.PAT}}
         run: |
-          gh pr merge $PULL_REQUEST_NUMBER --add-label ci-internal:merge
+          gh pr merge $PULL_REQUEST_NUMBER --squash --delete-branch
 
       - name: remove label
         if: always()
