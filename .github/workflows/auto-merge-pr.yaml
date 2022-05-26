@@ -31,14 +31,16 @@ jobs:
         run: |
           npm ci
 
-      - name: Bump packages
-        run: |
-          node scripts/bump-version.js
-
       - name: Setup git
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+
+      - name: Bump packages
+        run: |
+          node scripts/bump-version.js
+          git add .
+          git commit --no-allow-empty -m "chore: bump dependencies" || true
 
       # - name: Update THIRD-PARTY-NOTICES.md
       #   run: npm run update-third-party-notices
@@ -60,7 +62,7 @@ jobs:
         env:
           PR_HEAD_REF: ${{github.head_ref}}
         run: |
-          git push --set-upstream origin ${PR_HEAD_REF} --force-with-lease
+          git push --set-upstream origin ${PR_HEAD_REF}
 
       - name: Merge PR
         env:
