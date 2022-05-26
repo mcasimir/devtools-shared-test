@@ -1,0 +1,60 @@
+name: Mark Pull Requests for merge
+
+on:
+  # Every 2 minutes
+  schedule:
+    - cron: "*/2 * * * *"
+
+jobs:
+  main:
+    name: Mark PRs for merge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+          ref: ${{ github.head_ref }}
+
+      - name: Setup git
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Mark the first mergeable pr for merge
+        env:
+          # we need to use a PAT so checks gets re-run
+          # see: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        run: |
+          open_prs=$(gh pr list --state open \
+            --json mergeStateStatus,number,labels,isCrossRepository | \
+            jq '[.[] | select(.isCrossRepository == false)]' | \
+            jq '[.[] | {labels: .labels | [ .[].name ], mergeStateStatus: .mergeStateStatus, number: .number}]' \
+          )
+
+          already_merging=$(echo $open_prs | \
+            jq 'any(.labels | contains(["ci-internal:merge"])) \
+          )
+
+          if [ "$already_merging" = "true" ]; then
+            echo "Another merge is already in progress. Skipping."
+            exit
+          fi
+
+          mergeable_prs=$(echo $open_prs | \
+            jq '[.[] | select(.mergeStateStatus == "CLEAN")]' | \
+            jq '[.[] | select(.labels | contains(["ready-for-merge"])]' | \
+            jq '[.[] | select(.labels | contains(["ci-internal:rebase"]) | not]' \
+          )
+
+          any_mergeable=$(echo $mergeable_prs | jq 'isempty(.[])')
+
+          if [ "$any_mergeable" = "false" ]; then
+            echo "No mergeable PR found. Skipping."
+            exit
+          fi
+
+          pr_number=$(echo $mergeable_prs | jq 'first.number')
+
+          gh pr edit $pr_number --add-label ci-internal:merge

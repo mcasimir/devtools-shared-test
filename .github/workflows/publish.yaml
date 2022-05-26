@@ -5,31 +5,24 @@
 #     branches:
 #       - main
 #
-#
-#
 # jobs:
 #   publish:
 #     if: github.event.pull_request.merged == true
 #     runs-on: ubuntu-latest
-
+#
 #     steps:
 #     - name: "Checkout"
 #       uses: actions/checkout@v2
 #       with:
 #         fetch-depth: 0
-
+#
 #     - name: "Use NodeJS 14"
 #       uses: actions/setup-node@v2
 #       with:
 #         node-version: '14'
-
-#     - name: "Version and publish" # Interesting step
+#
+#     - name: "Publish what is not already in NPM"
 #       env:
-#         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 #       run: |
-#         git config user.name "${{ github.actor }}"
-#         git config user.email "${{ github.actor}}@users.noreply.github.com"
-
-#         # TODO:
-#         # npx lerna version --conventional-commits --no-git-tag-version --yes
-#         # npx lerna publish from-git --yes
+#         npx lerna publish --no-git-tag-version --no-push from-package --yes
