@@ -10,21 +10,14 @@ jobs:
     name: Rebase
     runs-on: ubuntu-latest
     steps:
-      - name: git checkout
+      - name: Checkout the latest code
         uses: actions/checkout@v2
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Set up Git
-        run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-
-      - name: automatic rebase
-        run: |
-          set -e
-          git rebase origin/main
-          git push --force-with-lease
+      - name: Automatic Rebase
+        uses: cirrus-actions/rebase@1.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
