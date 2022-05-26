@@ -23,6 +23,8 @@ jobs:
 
       - name: Label all open prs for rebase
         env:
+          # we need to use a PAT so checks gets re-run
+          # see: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           gh pr list --state open --json url | \
