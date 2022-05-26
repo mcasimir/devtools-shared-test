@@ -20,13 +20,11 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
-
       - name: Rebase and push
         env:
-          PR_REF: {{github.ref}}
-          PR_HEAD_REF: {{github.head_ref}}
-          PR_BASE_REF: {{github.base_ref}}
-
+          PR_REF: ${{github.ref}}
+          PR_HEAD_REF: ${{github.head_ref}}
+          PR_BASE_REF: ${{github.base_ref}}
         run: |
           echo pr_ref=$PR_REF pr_head_ref=$PR_HEAD_REF pr_base_ref=$PR_BASE_REF
 
@@ -46,5 +44,3 @@ jobs:
         uses: actions-ecosystem/action-add-labels@v1
         with:
           labels: ci-internal:rebase-failed
-
-
