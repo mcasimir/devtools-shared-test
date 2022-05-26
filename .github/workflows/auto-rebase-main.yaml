@@ -1,0 +1,24 @@
+name: Mark Pull Requests for rebase
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  main:
+    name: Mark PRs for Rebase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+
+      - name: Label all open prs for rebase
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr list --state open --json url | \
+            jq -r .[].url | \
+            while read line ; do \
+              gh pr edit $line --add-label ci-internal:rebase ; \
+              done
