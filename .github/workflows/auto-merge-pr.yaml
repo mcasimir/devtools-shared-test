@@ -1,0 +1,90 @@
+name: Rebase Pull Request
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  main:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.label.name == 'ci-internal:merge' }}
+    name: Rebase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+        with:
+          # otherwise, there would be errors pushing refs to the destination repository
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          # Version Spec of the version to use.  Examples: 12.x, 10.15.1, >=10.15.0
+          node-version: ^14.17.5
+          cache: 'npm'
+
+      - name: Install npm@7
+        run: npm install -g npm@7
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Bump packages
+        run: |
+          node scripts/bump-version.js
+
+      - name: Update authors and
+
+      - name: Setup git
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Update THIRD-PARTY-NOTICES.md
+        run: npm run update-third-party-notices
+
+      - name: Commit THIRD-PARTY-NOTICES changes
+        run: |
+          git add THIRD-PARTY-NOTICES.md
+          git commit --no-allow-empty -m "chore: update THIRD-PARTY-NOTICES" THIRD-PARTY-NOTICES.md || true
+
+      - name: Update AUTHORS
+        run: npm run update-authors
+
+      - name: Commit AUTHORS changes
+        run: |
+          git add AUTHORS
+          git commit --no-allow-empty -m "chore: update AUTHORS" AUTHORS || true
+
+      - name: Push
+        env:
+          PR_HEAD_REF: ${{github.head_ref}}
+        run: |
+          git push --set-upstream origin ${PR_HEAD_REF} --force-with-lease
+
+      - name: Merge PR
+        env:
+          PULL_REQUEST_NUMBER: ${{github.event.pull_request.number}}
+          GITHUB_TOKEN: ${{secrets.PAT}}
+        run: |
+          gh pr merge $PULL_REQUEST_NUMBER --add-label ci-internal:merge
+
+      - name: remove label
+        if: always()
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: ci-internal:merge
+
+      - name: remove label
+        if: success()
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: ci-internal:merge-failed
+
+      - name: add label on failure
+        if: failure()
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: ci-internal:merge-failed
