@@ -2,11 +2,11 @@ name: Rebase Pull Request
 
 on:
   pull_request:
-    types: [synchronize]
+    types: [labeled]
 
 jobs:
   main:
-    # if: ${{ github.event.label.name == 'ci-internal:rebase' }}
+    if: ${{ github.event.label.name == 'ci-internal:rebase' }}
     name: Rebase
     runs-on: ubuntu-latest
     steps:
