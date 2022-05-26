@@ -13,8 +13,12 @@ jobs:
       - name: Checkout the latest code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+          # otherwise, there would be errors pushing refs to the destination repository
+          fetch-depth: 0
           ref: ${{ github.head_ref }}
+          # we need to use a PAT so checks gets re-run
+          # see: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
+          token: ${{ secrets.PAT }}
 
       - name: Setup git
         run: |
