@@ -22,6 +22,7 @@ jobs:
 
       - name: automatic rebase
         run: |
+          set -e
           git rebase origin/main
           git push --force-with-lease
         env:
@@ -32,4 +33,11 @@ jobs:
         uses: actions-ecosystem/action-remove-labels@v1
         with:
           labels: ci-internal:rebase
+
+      - name: add label on failure
+        if: failure()
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: ci-internal:rebase-failed
+
 
