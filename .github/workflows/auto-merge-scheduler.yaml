@@ -1,6 +1,8 @@
 name: Mark Pull Requests for merge
 
 on:
+  workflow_dispatch:
+
   # Every 5 minutes
   # this is the shortest interval allowed by github
   schedule:
