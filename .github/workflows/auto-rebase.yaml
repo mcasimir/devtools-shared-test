@@ -22,16 +22,11 @@ jobs:
 
       - name: Rebase and push
         env:
-          PR_REF: ${{github.ref}}
           PR_HEAD_REF: ${{github.head_ref}}
           PR_BASE_REF: ${{github.base_ref}}
         run: |
-          echo pr_ref=$PR_REF pr_head_ref=$PR_HEAD_REF pr_base_ref=$PR_BASE_REF
-
-          # git rebase origin/main
-          # remote_repo="${INPUT_GITHUB_URL_PROTOCOL}//${GITHUB_ACTOR}:${INPUT_GITHUB_TOKEN}@${INPUT_GITHUB_URL}/${REPOSITORY}.git"
-
-          # git push "${remote_repo}" HEAD:${INPUT_BRANCH} --force-with-lease;
+          git rebase origin/${PR_BASE_REF}
+          git push origin HEAD:${PR_HEAD_REF} --force-with-lease
 
       - name: remove label
         if: always()
