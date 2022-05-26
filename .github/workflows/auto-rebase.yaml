@@ -6,7 +6,7 @@ on:
 
 jobs:
   main:
-    if: ${{ github.event.label.name == 'ci-internal:rebase' }}
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.label.name == 'ci-internal:rebase' }}
     name: Rebase
     runs-on: ubuntu-latest
     steps:
