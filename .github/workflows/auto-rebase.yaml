@@ -1,4 +1,4 @@
-# name: Rebase Pull Request
+name: Rebase Pull Request
 
 on:
   pull_request:
@@ -10,38 +10,22 @@ jobs:
     name: Rebase
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: git checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: automatic rebase
+      - name: Set up Git
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
 
-      - name: Update CHANGELOG.md
+      - name: automatic rebase
         run: |
           git rebase origin/main
-          echo "# Change Log" > CHANGELOG.md
-          echo "" >> CHANGELOG.md
-          tags=$(gh api repos/mongodb-js/vscode/releases | jq -r .[].tag_name | grep -v internal | grep -v pre | grep -v beta)
-          # NOTE: here the quotes around $tags are necessary
-          echo "$tags" | while read tagName; do
-            json=$(gh release view $tagName --json=name,publishedAt,url,body)
-            url=$(echo $json | jq -r .url)
-            name=$(echo $json | jq -r .name)
-            date=$(echo $json | jq -r .publishedAt | cut -f1 -dT)
-            body=$(echo $json | jq -r .body)
-            echo "## [$name]($url) - $date" >> CHANGELOG.md
-            echo "" >> CHANGELOG.md
-            echo "$body" >> CHANGELOG.md
-            echo "" >> CHANGELOG.md
-            echo "" >> CHANGELOG.md
-          done
+          git push --force-with-lease
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-        uses: cirrus-actions/rebase@1.5
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: remove label
         if: always()
