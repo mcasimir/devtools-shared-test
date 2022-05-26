@@ -39,17 +39,19 @@ jobs:
 
           mergeable_prs=$(echo $open_prs | \
             jq '[.[] | select(.mergeStateStatus == "CLEAN")]' | \
-            jq '[.[] | select(.labels | contains(["ready-for-merge"])]' | \
-            jq '[.[] | select(.labels | contains(["ci-internal:rebase"]) | not]' \
+            jq '[.[] | select(.labels | contains(["ready-for-merge"]))]' | \
+            jq '[.[] | select(.labels | contains(["ci-internal:rebase"]) | not)]' \
           )
 
-          any_mergeable=$(echo $mergeable_prs | jq 'isempty(.[])')
+          no_mergeable_pr=$(echo $mergeable_prs | jq 'isempty(.[])')
 
-          if [ "$any_mergeable" = "false" ]; then
+          if [ "$no_mergeable_pr" = "true" ]; then
             echo "No mergeable PR found. Skipping."
             exit
           fi
 
           pr_number=$(echo $mergeable_prs | jq 'first.number')
+
+          echo "Selected pr #${pr_number} for merge"
 
           gh pr edit $pr_number --add-label ci-internal:merge
