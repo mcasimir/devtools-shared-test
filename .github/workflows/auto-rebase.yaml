@@ -11,22 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
           fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
-      - name: Setup Git
-        run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          ref: ${{ github.head_ref }}
 
-      - name: Rebase and push
+      - name: Rebase
         env:
-          PR_HEAD_REF: ${{github.head_ref}}
           PR_BASE_REF: ${{github.base_ref}}
         run: |
           git rebase origin/${PR_BASE_REF}
-          git push origin HEAD:${PR_HEAD_REF} --force-with-lease
+
+      - name: Push
+        env:
+          PR_HEAD_REF: ${{github.head_ref}}
+        run: |
+          git push --set-upstream origin ${PR_HEAD_REF} --force-with-lease
 
       - name: remove label
         if: always()
@@ -34,8 +34,8 @@ jobs:
         with:
           labels: ci-internal:rebase
 
-      - name: add label on failure
-        if: failure()
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          labels: ci-internal:rebase-failed
+      # - name: add label on failure
+      #   if: failure()
+      #   uses: actions-ecosystem/action-add-labels@v1
+      #   with:
+      #     labels: ci-internal:rebase-failed
