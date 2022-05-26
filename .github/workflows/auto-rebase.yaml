@@ -1,29 +1,52 @@
-# name: Rebase Pull Request
+name: Rebase Pull Request
 
-# on:
-#   pull_request:
-#     types: [labeled]
+on:
+  pull_request:
+    types: [labeled]
 
-# jobs:
-#   main:
-#     if: ${{ github.event.label.name == 'ci-internal:rebase' }}
-#     name: Rebase
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: git checkout
-#         uses: actions/checkout@v2
-#         with:
-#           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-#           fetch-depth: 0
+jobs:
+  main:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.label.name == 'ci-internal:rebase' }}
+    name: Rebase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+          ref: ${{ github.head_ref }}
 
-#       - name: automatic rebase
-#         uses: cirrus-actions/rebase@1.5
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      - name: Setup git
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
 
-#       - name: remove label
-#         if: always()
-#         uses: actions-ecosystem/action-remove-labels@v1
-#         with:
-#           labels: ci-internal:rebase
+      - name: Rebase
+        env:
+          PR_BASE_REF: ${{github.base_ref}}
+        run: |
+          git rebase origin/${PR_BASE_REF}
 
+      - name: Push
+        env:
+          PR_HEAD_REF: ${{github.head_ref}}
+        run: |
+          git push --set-upstream origin ${PR_HEAD_REF} --force-with-lease
+
+      - name: remove label
+        if: always()
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: ci-internal:rebase
+
+      - name: remove label
+        if: success()
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: ci-internal:rebase-failed
+
+      - name: add label on failure
+        if: failure()
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: ci-internal:rebase-failed
