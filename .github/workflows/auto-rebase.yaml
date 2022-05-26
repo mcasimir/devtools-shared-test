@@ -13,13 +13,27 @@ jobs:
       - name: Checkout the latest code
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+      - name: Setup Git
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
 
-      - name: Automatic Rebase
-        uses: cirrus-actions/rebase@1.5
+
+      - name: Rebase and push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_REF: {{github.ref}}
+          PR_HEAD_REF: {{github.head_ref}}
+          PR_BASE_REF: {{github.base_ref}}
+
+        run: |
+          echo pr_ref=$PR_REF pr_head_ref=$PR_HEAD_REF pr_base_ref=$PR_BASE_REF
+
+          # git rebase origin/main
+          # remote_repo="${INPUT_GITHUB_URL_PROTOCOL}//${GITHUB_ACTOR}:${INPUT_GITHUB_TOKEN}@${INPUT_GITHUB_URL}/${REPOSITORY}.git"
+
+          # git push "${remote_repo}" HEAD:${INPUT_BRANCH} --force-with-lease;
 
       - name: remove label
         if: always()
