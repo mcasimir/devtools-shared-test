@@ -1,4 +1,4 @@
-name: Rebase Pull Request
+name: Merge Pull Request
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 jobs:
   main:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.label.name == 'ci-internal:merge' }}
-    name: Rebase
+    name: Merge
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
@@ -34,8 +34,6 @@ jobs:
       - name: Bump packages
         run: |
           node scripts/bump-version.js
-
-      - name: Update authors and
 
       - name: Setup git
         run: |
