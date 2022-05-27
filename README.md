@@ -2,7 +2,7 @@
 
 This repository contains packages that are shared dependencies of Compass, the MongoDB extension for VSCode and MongoSH.
 
-To start working
+To start working:
 
 ```
 npm run bootstrap
