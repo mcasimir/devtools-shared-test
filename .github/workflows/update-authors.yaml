@@ -29,14 +29,23 @@ jobs:
           npm ci
 
       - name: Update AUTHORS
-        run: npm run update-authors
+        run: |
+          echo Authors before: -----
+          cat AUTHORS
+          echo -----
+
+          npm run update-authors
+
+          echo Authors after: -----
+          cat AUTHORS
+          echo -----
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          add-paths: |
-            AUTHORS
           commit-message: Update report
+          committer: "github-actions[bot]"
+          author: "41898282+github-actions[bot]@users.noreply.github.com"
           branch: ci/update-3rd-party-notices-and-authors
           title: 'chore: update AUTHORS'
           body: |
