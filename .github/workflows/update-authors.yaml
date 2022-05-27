@@ -49,6 +49,8 @@ jobs:
           commit-message: Update report
           branch: ci/update-3rd-party-notices-and-authors
           title: 'chore: update AUTHORS'
+          set-paths: |
+            AUTHORS
           body: |
             - Update `AUTHORS`
 
