@@ -37,8 +37,6 @@ jobs:
           add-paths: |
             AUTHORS
           commit-message: Update report
-          committer: "github-actions[bot]"
-          author: "41898282+github-actions[bot]@users.noreply.github.com"
           branch: ci/update-3rd-party-notices-and-authors
           title: 'chore: update AUTHORS'
           body: |
