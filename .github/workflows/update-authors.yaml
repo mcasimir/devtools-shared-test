@@ -28,6 +28,11 @@ jobs:
           npm -v
           npm ci
 
+      - name: Set up Git
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
       - name: Update AUTHORS
         run: |
           echo Authors before: -----
@@ -39,6 +44,9 @@ jobs:
           echo Authors after: -----
           cat AUTHORS
           echo -----
+
+          git add AUTHORS
+          git commit --no-allow-empty -m "chore: update AUTHORS" AUTHORS || true
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
