@@ -15,6 +15,7 @@ jobs:
         with:
           # otherwise, there would be errors pushing refs to the destination repository
           fetch-depth: 0
+          # don't checkout a detatched HEAD
           ref: ${{ github.head_ref }}
           # we need to use a PAT so checks gets re-run
           # see: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow

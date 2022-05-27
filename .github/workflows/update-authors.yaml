@@ -15,7 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: main
+          # don't checkout a detatched HEAD
+          # this is important so git log can pick up on
+          # the whole history to generate the list of AUTHORS
+          ref: ${{ github.head_ref }}
 
       - uses: actions/setup-node@v2
         with:
@@ -32,25 +35,15 @@ jobs:
           npm ci
 
       - name: Update AUTHORS
-        run: |
-          echo Authors before: -----
-          cat AUTHORS
-          echo -----
-
-          npm run update-authors
-
-          echo Authors after: -----
-          cat AUTHORS
-          echo -----
+        run: npm run update-authors
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
           commit-message: Update report
-          branch: ci/update-3rd-party-notices-and-authors
+          branch: ci/update-authors
           title: 'chore: update AUTHORS'
-          set-paths: |
-            AUTHORS
+          add-paths:
+            - AUTHORS
           body: |
             - Update `AUTHORS`
-
