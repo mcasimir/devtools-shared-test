@@ -24,6 +24,7 @@ async function getLinuxInfo(): Promise<{
       .filter(Boolean)
       .map((l) => l.split('='));
 
+    // todo: use Object.fromEntries
     const distId = releaseKv
       .find(([k]) => k === 'ID')?.[1]
       .replace(/["']/g, '');
