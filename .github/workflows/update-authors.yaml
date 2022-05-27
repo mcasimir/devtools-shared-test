@@ -31,7 +31,7 @@ jobs:
           npm -v
           npm ci
 
-     - name: Update AUTHORS
+      - name: Update AUTHORS
         run: |
           echo Authors before: -----
           cat AUTHORS
