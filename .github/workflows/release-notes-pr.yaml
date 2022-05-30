@@ -22,8 +22,8 @@ jobs:
 
       - name: add label based on title - fix
         if: |
-          startsWith(github.event.pull_request.title, 'feat:') ||
-          startsWith(github.event.pull_request.title, 'feat(')
+          startsWith(github.event.pull_request.title, 'fix:') ||
+          startsWith(github.event.pull_request.title, 'fix(')
         uses: actions-ecosystem/action-add-labels@v1
         with:
           labels: fix
