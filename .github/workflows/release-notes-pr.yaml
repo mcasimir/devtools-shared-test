@@ -18,7 +18,9 @@ jobs:
       - name: remove label
         uses: actions-ecosystem/action-remove-labels@v1
         with:
-          labels: fix, feat
+          labels: |
+            fix
+            feat
 
       - name: add label based on title - fix
         if: |
