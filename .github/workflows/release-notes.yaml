@@ -1,15 +1,10 @@
+name: Release Notes - Cleanup
+
 on:
   release:
     types:
       - created
       - edited
-
-name: Release Notes - Cleanup
-on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
 
 jobs:
   clean:
