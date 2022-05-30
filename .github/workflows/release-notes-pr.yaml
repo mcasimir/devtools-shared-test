@@ -45,7 +45,7 @@ jobs:
       - uses: mheap/github-action-required-labels@v1
         if: |
           startsWith(github.event.pull_request.title, 'fix:') ||
-          startsWith(github.event.pull_request.title, 'fix(') }} ||
+          startsWith(github.event.pull_request.title, 'fix(') ||
           startsWith(github.event.pull_request.title, 'feat:') ||
           startsWith(github.event.pull_request.title, 'feat(')
         with:
