@@ -1,24 +1,16 @@
-name: Release Notes - Cleanup
-
+name: Release Notes - Cleanup Notes
 on:
   release:
-    types:
-      - created
-      - edited
-      - published
+    types: [created, edited, published]
 
 jobs:
-  clean:
+  cleanup_notes:
+    name: Cleanup Notes
     runs-on: ubuntu-latest
-
     steps:
-    # - name: "Use NodeJS 14"
-    #   uses: actions/setup-node@v2
-    #   with:
-    #     node-version: '14'
-
-    - name: "Clean up notes"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        echo $GITHUB_EVENT_PATH
+      - name: "Clean up notes"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "OK"
+          echo $GITHUB_EVENT_PATH
