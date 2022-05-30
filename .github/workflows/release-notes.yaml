@@ -10,7 +10,7 @@
 name: Release Notes - Cleanup
 on:
   release:
-    types: [created, edited]
+    types: [published, edited]
 
 jobs:
   cleanup_notes:
