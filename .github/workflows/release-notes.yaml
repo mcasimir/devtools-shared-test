@@ -17,9 +17,7 @@ jobs:
     name: Cleanup Notes
     runs-on: ubuntu-latest
     steps:
-      - name: "Clean up notes"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Clean up notes
         run: |
           cat $GITHUB_EVENT_PATH | \
             jq -r .release.body | \
@@ -31,5 +29,12 @@ jobs:
             sed 's/MONGOSH-[0-9]\{1,5\}/[&](https:\/\/jira.mongodb.org\/browse\/&)/g' \
             > RELEASE_NOTES.md
 
-          RELEASE_TAG=$(cat ${GITHUB_EVENT_PATH} | jq -r .release.tag_name)
-          gh release edit ${RELEASE_TAG} --notes-file RELEASE_NOTES.md
+      - name: Update release
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit "${RELEASE_TAG}"" \
+            --repo "${GITHUB_REPO}" \
+            --notes-file RELEASE_NOTES.md
