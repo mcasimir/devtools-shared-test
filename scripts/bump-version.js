@@ -82,6 +82,10 @@ function updateDeps(packageJson, newVersions) {
     for (const [depName, { version, inc: depInc }] of Object.entries(
       newVersions
     )) {
+      if (!section[depName]) {
+        continue;
+      }
+
       section[depName] = version;
 
       // we increment the package version based on the bump on dependencies:
