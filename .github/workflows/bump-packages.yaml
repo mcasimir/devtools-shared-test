@@ -43,6 +43,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
+          token: ${{ secrets.PAT }}
           commit-message: 'chore(ci): bump packages'
           branch: ci/bump-packages
           title: 'chore(ci): bump packages'
