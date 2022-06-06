@@ -1,8 +1,5 @@
 name: Bump packages
 on:
-  # Once a week or on pushes to main
-  schedule:
-    - cron: "0 3 * * 0"
   push:
     branches:
       - main

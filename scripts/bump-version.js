@@ -24,7 +24,7 @@ async function main() {
     );
   }
 
-  childProcess.spawnSync('npm', ['install', '--package-lock-only']);
+  console.log(newVersions);
 }
 
 main(...process.argv.slice(2));
