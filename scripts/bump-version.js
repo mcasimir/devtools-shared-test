@@ -113,15 +113,19 @@ function updateDeps(packageJson, newVersions) {
 }
 
 async function bumpVersionBasedOnCommits(packagePath, oldVersion, options) {
-  console.info('getting commits for package', JSON.stringify(packagePath));
-
   const commits = await getCommits({
     path: packagePath,
     range: options.range,
   });
 
+  console.info(
+    `[${packagePath}]`,
+    commits.length,
+    'commits found in range',
+    commits.length ? '' : '.. skipping'
+  );
+
   if (!commits.length) {
-    console.info('no commit found since last bump .. skipping');
     return oldVersion;
   }
 
@@ -152,7 +156,18 @@ async function bumpVersionBasedOnCommits(packagePath, oldVersion, options) {
     inc = maxIncrement(inc, 'patch');
   }
 
-  return semver.inc(oldVersion, inc);
+  const newVersion = semver.inc(oldVersion, inc);
+
+  console.info(
+    `[${packagePath}]`,
+    'bumping',
+    oldVersion,
+    'to',
+    newVersion,
+    `(${inc})`
+  );
+
+  return newVersion;
 }
 
 async function getRangeFromLastBump() {
