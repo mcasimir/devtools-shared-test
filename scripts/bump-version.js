@@ -108,7 +108,7 @@ async function bumpVersionBasedOnCommits(packagePath, oldVersion, options) {
     path: packagePath,
   });
 
-  const lastBumpIndex = commits.findIndex((c) =>
+  const lastBumpIndex = allCommits.findIndex((c) =>
     c.subject.startsWith(LAST_BUMP_COMMIT_MESSAGE)
   );
 
