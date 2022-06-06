@@ -103,7 +103,7 @@ function updateDeps(packageJson, newVersions) {
   return newPackageJson;
 }
 
-async function bumpVersionBasedOnCommits(packagePath, oldVersion, options) {
+async function bumpVersionBasedOnCommits(packagePath, oldVersion) {
   const allCommits = await getCommits({
     path: packagePath,
   });
@@ -129,7 +129,10 @@ async function bumpVersionBasedOnCommits(packagePath, oldVersion, options) {
   // everything else is a patch.
   //
   for (const { subject, body } of commits) {
-    if (/\bBREAKING CHANGES?\b/.test(body)) {
+    if (
+      /\bBREAKING CHANGES?\b/.test(subject) ||
+      /\bBREAKING CHANGES?\b/.test(body)
+    ) {
       inc = 'major';
       break;
     }
