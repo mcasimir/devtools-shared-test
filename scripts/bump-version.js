@@ -157,7 +157,8 @@ async function bumpVersionBasedOnCommits(packagePath, oldVersion) {
 async function processPackage(packagePath, newVersions, options) {
   const packageJsonPath = path.join(packagePath, 'package.json');
 
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath));
+  const origPackageJsonString = fs.readFileSync(packageJsonPath);
+  const packageJson = JSON.parse(origPackageJsonString);
 
   const packageJsonAfterDepBump = updateDeps(packageJson, newVersions);
 
@@ -184,9 +185,13 @@ async function processPackage(packagePath, newVersions, options) {
   const newPackageJson = { ...packageJsonAfterDepBump, version: newVersion };
 
   if (!deepEqual(newPackageJson, packageJson)) {
+    const trailingSpacesMatch = origPackageJsonString.match(/}(\s*)$/);
+    const trailingSpaces =
+      (trailingSpacesMatch && trailingSpacesMatch[1]) || '';
+
     fs.writeFileSync(
       packageJsonPath,
-      JSON.stringify(newPackageJson, null, 2),
+      JSON.stringify(newPackageJson + trailingSpaces, null, 2),
       'utf-8'
     );
   }
