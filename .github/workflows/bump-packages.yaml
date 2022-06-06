@@ -49,12 +49,10 @@ jobs:
           body: |
             - Bump package versions
 
-      - name: Automerge
+      - name: Merge PR
         if: steps.cpr.outputs.pull-request-operation == 'created'
-        uses: peter-evans/enable-pull-request-automerge@v2
-        with:
-          token: ${{ secrets.PAT }}
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-          merge-method: squash
-
-
+        env:
+          PULL_REQUEST_NUMBER: ${{steps.cpr.outputs.pull-request-number}}
+          GITHUB_TOKEN: ${{secrets.PAT}}
+        run: |
+          gh pr merge $PULL_REQUEST_NUMBER --squash --delete-branch
