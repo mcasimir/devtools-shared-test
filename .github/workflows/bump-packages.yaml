@@ -1,5 +1,4 @@
-name: Update Authors and Third Party Notices
-
+name: Bump packages
 on:
   # Once a week or on pushes to main
   schedule:
