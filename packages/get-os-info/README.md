@@ -1,6 +1,6 @@
 # get-os-info
 
-Returns info about the host os
+Returns info about the host os:
 
 ``` js
 const info = await getOsInfo();
