@@ -191,7 +191,7 @@ async function processPackage(packagePath, newVersions, options) {
 
     fs.writeFileSync(
       packageJsonPath,
-      JSON.stringify(newPackageJson + trailingSpaces, null, 2),
+      JSON.stringify(newPackageJson, null, 2) + trailingSpaces,
       'utf-8'
     );
   }
