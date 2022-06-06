@@ -23,9 +23,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           open_prs=$(gh pr list --state open \
-            --json mergeStateStatus,number,labels,isCrossRepository | \
+            --json mergeStateStatus,mergeable,number,labels,isCrossRepository | \
             jq '[.[] | select(.isCrossRepository == false)]' | \
-            jq '[.[] | {labels: .labels | [ .[].name ], mergeStateStatus: .mergeStateStatus, number: .number}]' \
+            jq '[.[] | {labels: .labels | [ .[].name ], mergeable: .mergeable, mergeStateStatus: .mergeStateStatus, number: .number}]' \
           )
 
           already_merging=$(echo $open_prs | \
@@ -39,6 +39,7 @@ jobs:
 
           mergeable_prs=$(echo $open_prs | \
             jq '[.[] | select(.mergeStateStatus == "CLEAN")]' | \
+            jq '[.[] | select(.mergeable == "MERGEABLE")]' | \
             jq '[.[] | select(.labels | contains(["ready-for-merge"]))]' | \
             jq '[.[] | select(.labels | contains(["ci-internal:rebase"]) | not)]' \
           )

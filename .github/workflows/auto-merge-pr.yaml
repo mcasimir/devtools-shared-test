@@ -39,18 +39,6 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
-      - name: Bump packages
-        run: |
-          node scripts/bump-version.js
-          git add .
-          git commit --no-allow-empty -m "chore: bump dependencies" || true
-
-      - name: Push
-        env:
-          PR_HEAD_REF: ${{github.head_ref}}
-        run: |
-          git push --set-upstream origin ${PR_HEAD_REF}
-
       - name: Merge PR
         env:
           PULL_REQUEST_NUMBER: ${{github.event.pull_request.number}}
