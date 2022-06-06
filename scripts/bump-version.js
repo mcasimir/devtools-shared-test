@@ -157,7 +157,7 @@ async function bumpVersionBasedOnCommits(packagePath, oldVersion) {
 async function processPackage(packagePath, newVersions, options) {
   const packageJsonPath = path.join(packagePath, 'package.json');
 
-  const origPackageJsonString = fs.readFileSync(packageJsonPath);
+  const origPackageJsonString = fs.readFileSync(packageJsonPath, 'utf-8');
   const packageJson = JSON.parse(origPackageJsonString);
 
   const packageJsonAfterDepBump = updateDeps(packageJson, newVersions);
