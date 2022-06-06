@@ -40,6 +40,7 @@ jobs:
           git commit --no-allow-empty -m "chore: bump dependencies" || true
 
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
           commit-message: 'chore(ci): bump packages'
