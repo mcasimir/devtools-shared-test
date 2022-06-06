@@ -22,7 +22,8 @@ async function main() {
   for (const packageInfo of packages) {
     await processPackage(
       path.relative(monorepoRootPath, packageInfo.location),
-      newVersions
+      newVersions,
+      { range: await getRangeFromLastBump() }
     );
   }
 
@@ -43,10 +44,10 @@ function getPackages(cwd) {
   return JSON.parse(stdout);
 }
 
-async function getCommits({ path }) {
+async function getCommits({ path, range }) {
   return new Promise((resolve) => {
     const stream = gitLogParser.parse({
-      _: ['remotes/origin/main', path],
+      _: [range, path].filter(Boolean),
     });
 
     const commits = [];
@@ -111,27 +112,12 @@ function updateDeps(packageJson, newVersions) {
   return newPackageJson;
 }
 
-async function bumpVersionBasedOnCommits(packagePath, oldVersion) {
-  log('bumpVersionBasedOnCommits', packagePath, { oldVersion });
-
-  const allCommits = await getCommits({
+async function bumpVersionBasedOnCommits(packagePath, oldVersion, options) {
+  log('getting commits for package', packagePath, 'range', options.range);
+  const commits = await getCommits({
     path: packagePath,
+    range: options.range,
   });
-
-  log('total commits found', allCommits.length);
-
-  const lastBumpIndex = allCommits.findIndex((c) =>
-    c.subject.startsWith(LAST_BUMP_COMMIT_MESSAGE)
-  );
-
-  log(
-    'lastBumpIndex',
-    lastBumpIndex,
-    lastBumpIndex === -1 ? {} : allCommits[lastBumpIndex].subject
-  );
-
-  const commits =
-    lastBumpIndex === -1 ? allCommits : allCommits.slice(0, lastBumpIndex);
 
   if (!commits.length) {
     log('no commit found since last bump .. skipping');
@@ -141,7 +127,8 @@ async function bumpVersionBasedOnCommits(packagePath, oldVersion) {
   let inc = 'patch';
 
   // calculate bump as follows:
-  // if any commit body contains BREAKING CHANGE or BREAKING CHANGES
+  // if any commit subject or body contains
+  //    BREAKING CHANGE or BREAKING CHANGES
   // -> then is a major bump
   // if subject starts with feat or fix
   // -> then is a minor bump
@@ -165,6 +152,22 @@ async function bumpVersionBasedOnCommits(packagePath, oldVersion) {
   }
 
   return semver.inc(oldVersion, inc);
+}
+
+async function getRangeFromLastBump() {
+  const allCommits = await getCommits({
+    path: '.',
+  });
+
+  log('total commits found', allCommits.length);
+
+  const lastBumpCommit = allCommits.find((c) =>
+    c.subject.startsWith(LAST_BUMP_COMMIT_MESSAGE)
+  );
+
+  log('lastBumpCommit', lastBumpCommit);
+
+  return lastBumpCommit ? `${lastBumpCommit.commit.long}...HEAD` : undefined;
 }
 
 // walk the dep tree up
