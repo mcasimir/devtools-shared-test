@@ -8,8 +8,6 @@ const semver = require('semver');
 
 const LAST_BUMP_COMMIT_MESSAGE = 'chore(ci): bump packages';
 
-const log = console.log;
-
 async function main() {
   if (!fs.existsSync('./package.json') || !fs.existsSync('.git')) {
     throw new Error('this command can only be run from the root of a monorepo');
@@ -19,11 +17,13 @@ async function main() {
   const packages = getPackages(monorepoRootPath);
 
   const newVersions = [];
+  const range = await getRangeFromLastBump();
+
   for (const packageInfo of packages) {
     await processPackage(
       path.relative(monorepoRootPath, packageInfo.location),
       newVersions,
-      { range: await getRangeFromLastBump() }
+      { range }
     );
   }
 
@@ -113,14 +113,15 @@ function updateDeps(packageJson, newVersions) {
 }
 
 async function bumpVersionBasedOnCommits(packagePath, oldVersion, options) {
-  log('getting commits for package', packagePath, 'range', options.range);
+  console.info('getting commits for package', JSON.stringify(packagePath));
+
   const commits = await getCommits({
     path: packagePath,
     range: options.range,
   });
 
   if (!commits.length) {
-    log('no commit found since last bump .. skipping');
+    console.info('no commit found since last bump .. skipping');
     return oldVersion;
   }
 
@@ -159,15 +160,25 @@ async function getRangeFromLastBump() {
     path: '.',
   });
 
-  log('total commits found', allCommits.length);
+  console.info('total commits found', allCommits.length);
 
   const lastBumpCommit = allCommits.find((c) =>
     c.subject.startsWith(LAST_BUMP_COMMIT_MESSAGE)
   );
 
-  log('lastBumpCommit', lastBumpCommit);
+  console.info(
+    'lastBumpCommit',
+    lastBumpCommit
+      ? `${lastBumpCommit.commit.long} ${lastBumpCommit.subject}`
+      : '-'
+  );
 
-  return lastBumpCommit ? `${lastBumpCommit.commit.long}...HEAD` : undefined;
+  const range = lastBumpCommit
+    ? `${lastBumpCommit.commit.long}...HEAD`
+    : undefined;
+
+  console.info('range:', range);
+  return range;
 }
 
 // walk the dep tree up
