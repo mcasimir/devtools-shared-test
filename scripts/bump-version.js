@@ -8,6 +8,8 @@ const semver = require('semver');
 
 const LAST_BUMP_COMMIT_MESSAGE = 'chore(ci): bump packages';
 
+const log = console.log;
+
 async function main() {
   if (!fs.existsSync('./package.json') || !fs.existsSync('.git')) {
     throw new Error('this command can only be run from the root of a monorepo');
@@ -110,18 +112,29 @@ function updateDeps(packageJson, newVersions) {
 }
 
 async function bumpVersionBasedOnCommits(packagePath, oldVersion) {
+  log('bumpVersionBasedOnCommits', packagePath, { oldVersion });
+
   const allCommits = await getCommits({
     path: packagePath,
   });
 
+  log('total commits found', allCommits.length);
+
   const lastBumpIndex = allCommits.findIndex((c) =>
     c.subject.startsWith(LAST_BUMP_COMMIT_MESSAGE)
+  );
+
+  log(
+    'lastBumpIndex',
+    lastBumpIndex,
+    lastBumpIndex === -1 ? {} : allCommits[lastBumpIndex].subject
   );
 
   const commits =
     lastBumpIndex === -1 ? allCommits : allCommits.slice(0, lastBumpIndex);
 
   if (!commits.length) {
+    log('no commit found since last bump .. skipping');
     return oldVersion;
   }
 
