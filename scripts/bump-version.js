@@ -6,6 +6,8 @@ const assert = require('assert');
 const gitLogParser = require('git-log-parser');
 const semver = require('semver');
 
+const LAST_BUMP_COMMIT_MESSAGE = 'chore(ci): bump packages';
+
 async function main() {
   if (!fs.existsSync('./package.json') || !fs.existsSync('.git')) {
     throw new Error('this command can only be run from the root of a monorepo');
@@ -18,11 +20,7 @@ async function main() {
   for (const packageInfo of packages) {
     await processPackage(
       path.relative(monorepoRootPath, packageInfo.location),
-      newVersions,
-      {
-        fromRef: 'remotes/origin/main',
-        toRef: 'HEAD',
-      }
+      newVersions
     );
   }
 
@@ -41,10 +39,10 @@ function getPackages(cwd) {
   return JSON.parse(stdout);
 }
 
-async function getCommits({ fromRef, toRef, path }) {
+async function getCommits({ path }) {
   return new Promise((resolve) => {
     const stream = gitLogParser.parse({
-      _: [`${fromRef ? fromRef + '..' : ''}${toRef}`, path],
+      _: ['remotes/origin/main', path],
     });
 
     const commits = [];
@@ -106,11 +104,16 @@ function updateDeps(packageJson, newVersions) {
 }
 
 async function bumpVersionBasedOnCommits(packagePath, oldVersion, options) {
-  const commits = await getCommits({
-    fromRef: options.fromRef,
-    toRef: options.toRef,
+  const allCommits = await getCommits({
     path: packagePath,
   });
+
+  const lastBumpIndex = commits.findIndex((c) =>
+    c.subject.startsWith(LAST_BUMP_COMMIT_MESSAGE)
+  );
+
+  const commits =
+    lastBumpIndex === -1 ? allCommits : allCommits.slice(0, lastBumpIndex);
 
   if (!commits.length) {
     return oldVersion;
