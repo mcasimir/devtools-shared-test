@@ -32,14 +32,21 @@ async function main() {
   });
 }
 
-main(...process.argv.slice(2));
+main(...process.argv.slice(2)).catch((e) => {
+  console.log(e);
+  process.exit(1);
+});
 
 function getPackages(cwd) {
-  const { stdout } = childProcess.spawnSync(
+  const { stdout, status, output } = childProcess.spawnSync(
     'npx',
-    ['lerna', 'list', '--toposort', '--all', '--json'],
+    ['lerna@4.0.0', 'list', '--toposort', '--all', '--json'],
     { cwd }
   );
+
+  if (status !== 0) {
+    throw new Error(output);
+  }
 
   return JSON.parse(stdout);
 }
@@ -79,19 +86,19 @@ function updateDeps(packageJson, newVersions) {
     'peerDependencies',
     'optionalDependencies',
   ]) {
-    const section = newPackageJson[sectionName];
-    if (!section) {
+    const dependenciesSection = newPackageJson[sectionName];
+    if (!dependenciesSection) {
       continue;
     }
 
     for (const [depName, { version, inc: depInc }] of Object.entries(
       newVersions
     )) {
-      if (!section[depName]) {
+      if (!dependenciesSection[depName]) {
         continue;
       }
 
-      section[depName] = version;
+      dependenciesSection[depName] = version;
 
       // we increment the package version based on the bump on dependencies:
       // if a devDependency was bumped, regardless of the increment we increment of a
@@ -99,7 +106,7 @@ function updateDeps(packageJson, newVersions) {
       // the biggest increase.
 
       inc =
-        section === 'devDependencies'
+        dependenciesSection === 'devDependencies'
           ? maxIncrement('patch', inc)
           : maxIncrement(depInc, inc);
     }
