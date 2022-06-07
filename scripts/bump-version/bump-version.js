@@ -5,6 +5,7 @@ const assert = require('assert');
 
 const gitLogParser = require('git-log-parser');
 const semver = require('semver');
+const maxIncrement = require('./max-increment');
 
 const LAST_BUMP_COMMIT_MESSAGE = 'chore(ci): bump packages';
 
@@ -33,7 +34,7 @@ async function main() {
 }
 
 main(...process.argv.slice(2)).catch((e) => {
-  console.log(e);
+  console.debug(e);
   process.exit(1);
 });
 
@@ -64,18 +65,8 @@ async function getCommits({ path, range }) {
   });
 }
 
-function maxIncrement(inc1, inc2) {
-  if (inc1 && inc2) {
-    return semver.gt(semver.inc('1.0.0', inc1), semver.inc('1.0.0', inc2))
-      ? inc1
-      : inc2;
-  }
-
-  // return the first defined or undefined in neither are set
-  return inc1 || inc2;
-}
-
 function updateDeps(packageJson, newVersions) {
+  console.debug(`[${packageJson.name}]`, 'updateDeps', newVersions);
   const newPackageJson = { ...packageJson };
 
   let inc;
@@ -91,12 +82,28 @@ function updateDeps(packageJson, newVersions) {
       continue;
     }
 
-    for (const [depName, { version, inc: depInc }] of Object.entries(
+    for (const [depName, { version, bump: depInc }] of Object.entries(
       newVersions
     )) {
       if (!dependenciesSection[depName]) {
+        console.debug(
+          `[${packageJson.name}]`,
+          'updateDeps',
+          sectionName,
+          depName,
+          'skipping'
+        );
         continue;
       }
+
+      console.debug(
+        `[${packageJson.name}]`,
+        'updateDeps',
+        sectionName,
+        depName,
+        '->',
+        version
+      );
 
       dependenciesSection[depName] = version;
 
@@ -105,16 +112,35 @@ function updateDeps(packageJson, newVersions) {
       // patch, otherwise we replicate the increment of the dependency. We always keep
       // the biggest increase.
 
+      const oldInc = inc;
+
       inc =
-        dependenciesSection === 'devDependencies'
+        sectionName === 'devDependencies'
           ? maxIncrement('patch', inc)
           : maxIncrement(depInc, inc);
+
+      console.debug(
+        `[${packageJson.name}]`,
+        'inc',
+        sectionName === 'devDependencies',
+        {
+          depInc,
+          oldInc,
+          newInc: inc,
+        }
+      );
     }
   }
 
   if (inc) {
     newPackageJson.version = semver.inc(packageJson.version, inc);
   }
+
+  console.debug(
+    `[${packageJson.name}]`,
+    'new package json',
+    JSON.stringify(newPackageJson)
+  );
 
   return newPackageJson;
 }

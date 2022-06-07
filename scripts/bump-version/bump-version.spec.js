@@ -240,23 +240,25 @@ describe('bump-version', function () {
     );
   });
 
-  it.only('bumps a package with dependencies', function () {
+  it('bumps a package with dependencies', function () {
     makeBumpCommit();
     commitPackageChange('package1', 'feat: some change');
     runBumpVersion();
-    const {
-      // eslint-disable-next-line no-unused-vars
-      lock: _1,
-      ...manifests
-    } = readAllManifests();
+    const manifests = readAllManifests();
+    assert.deepStrictEqual(
+      manifests,
+      require('./fixtures/bump-package-1-feat.json')
+    );
+  });
 
-    const {
-      // eslint-disable-next-line no-unused-vars
-      lock: _2,
-      ...fixture
-    } = require('./fixtures/bump-package-1-feat.json');
-
-    console.log(manifests);
-    assert.deepStrictEqual(manifests, fixture);
+  it('bumps a package with dependencies (major)', function () {
+    makeBumpCommit();
+    commitPackageChange('package1', 'feat: some change BREAKING CHANGE');
+    runBumpVersion();
+    const manifests = readAllManifests();
+    assert.deepStrictEqual(
+      manifests,
+      require('./fixtures/bump-package-1-breaking.json')
+    );
   });
 });

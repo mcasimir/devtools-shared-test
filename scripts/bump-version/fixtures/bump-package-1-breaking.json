@@ -1,13 +1,13 @@
 {
   "package1": {
-    "version": "1.1.0",
+    "version": "2.0.0",
     "name": "package1"
   },
   "package2": {
     "version": "1.0.1",
     "name": "package2",
     "devDependencies": {
-      "package1": "1.1.0"
+      "package1": "2.0.0"
     }
   },
   "package3": {
@@ -15,7 +15,7 @@
     "name": "package3",
     "private": true,
     "devDependencies": {
-      "package1": "1.1.0"
+      "package1": "2.0.0"
     }
   },
   "package4": {
@@ -26,17 +26,17 @@
     }
   },
   "package5": {
-    "version": "1.1.0",
+    "version": "2.0.0",
     "name": "package5",
     "dependencies": {
-      "package1": "1.1.0"
+      "package1": "2.0.0"
     }
   },
   "package6": {
     "version": "1.0.1",
     "name": "package6",
     "devDependencies": {
-      "package5": "1.1.0"
+      "package5": "2.0.0"
     }
   },
   "lock": {
@@ -77,18 +77,18 @@
         "link": true
       },
       "packages/package1": {
-        "version": "1.1.0"
+        "version": "2.0.0"
       },
       "packages/package2": {
         "version": "1.0.1",
         "devDependencies": {
-          "package1": "1.1.0"
+          "package1": "2.0.0"
         }
       },
       "packages/package3": {
         "version": "1.0.1",
         "devDependencies": {
-          "package1": "1.1.0"
+          "package1": "2.0.0"
         }
       },
       "packages/package4": {
@@ -98,15 +98,15 @@
         }
       },
       "packages/package5": {
-        "version": "1.1.0",
+        "version": "2.0.0",
         "dependencies": {
-          "package1": "1.1.0"
+          "package1": "2.0.0"
         }
       },
       "packages/package6": {
         "version": "1.0.1",
         "devDependencies": {
-          "package5": "1.1.0"
+          "package5": "2.0.0"
         }
       }
     },
@@ -117,13 +117,13 @@
       "package2": {
         "version": "file:packages/package2",
         "requires": {
-          "package1": "1.1.0"
+          "package1": "2.0.0"
         }
       },
       "package3": {
         "version": "file:packages/package3",
         "requires": {
-          "package1": "1.1.0"
+          "package1": "2.0.0"
         }
       },
       "package4": {
@@ -135,13 +135,13 @@
       "package5": {
         "version": "file:packages/package5",
         "requires": {
-          "package1": "1.1.0"
+          "package1": "2.0.0"
         }
       },
       "package6": {
         "version": "file:packages/package6",
         "requires": {
-          "package5": "1.1.0"
+          "package5": "2.0.0"
         }
       }
     }
