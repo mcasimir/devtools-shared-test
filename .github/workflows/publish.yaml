@@ -1,28 +1,41 @@
-# name: Publish
-# on:
-#   pull_request:
-#     types: [closed]
-#     branches:
-#       - main
-#
-# jobs:
-#   publish:
-#     if: github.event.pull_request.merged == true
-#     runs-on: ubuntu-latest
-#
-#     steps:
-#     - name: "Checkout"
-#       uses: actions/checkout@v2
-#       with:
-#         fetch-depth: 0
-#
-#     - name: "Use NodeJS 14"
-#       uses: actions/setup-node@v2
-#       with:
-#         node-version: '14'
-#
-#     - name: "Publish what is not already in NPM"
-#       env:
-#         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-#       run: |
-#         npx lerna publish --no-git-tag-version --no-push from-package --yes
+name: Publish
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    # if: ${{ contains(github.event.head_commit.message, "chore(ci): bump packages") }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        # don't checkout a detatched HEAD
+        ref: ${{ github.head_ref }}
+
+        # this is important so git log can pick up on
+        # the whole history to generate the list of AUTHORS
+        fetch-depth: '0'
+
+    - name: Setup git
+      run: |
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+
+    - name: "Use NodeJS 14"
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: "Publish what is not already in NPM"
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
+        npx lerna list --since HEAD~1 --json \
+          jq '{tag: (.[].name + "@" + .[].version)}' | \
+          jq -r .tag | \
+          xargs -i sh -c "git tag -a {} -m {} || true"
+        git push --follow-tags
+
