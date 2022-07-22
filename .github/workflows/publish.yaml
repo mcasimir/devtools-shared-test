@@ -33,7 +33,7 @@ jobs:
       env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
-        npx lerna list --since HEAD~1 --json | \
+        npx lerna list -a --since HEAD~1 --json | \
           jq '{tag: (.[].name + "@" + .[].version)}' | \
           jq -r .tag | \
           xargs -i sh -c "git tag -a {} -m {} || true"
