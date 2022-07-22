@@ -6,7 +6,7 @@ Returns info about the host os:
 const info = await getOsInfo();
 ```
 
-very random change 123
+very random change 1234
 
 Example output:
 
