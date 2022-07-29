@@ -22,7 +22,7 @@ jobs:
         echo "$GITHUB_CONTEXT"
     - name: Debug conditions
       env:
-        GITHUB_CONTEXT_WORKFLOW_DISPATCH: ${{  toJson(github.event.workflow_dispatch) }}
+        GITHUB_CONTEXT_WORKFLOW_DISPATCH: ${{  toJson(github.event_name == 'workflow_dispatch') }}
         GITHUB_CONTEXT_WORKFLOW_RUN_CONCLUSION: ${{ toJson(github.event.workflow_run.conclusion == 'success') }}
         GITHUB_CONTEXT_IS_BUMP_PACKAGES: ${{ toJson(startsWith(github.event.workflow_run.head_commit.message, env.BUMP_COMMIT_MESSAGE)) }}
         COMM_MESS: ${{ env.BUMP_COMMIT_MESSAGE }}
