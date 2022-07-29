@@ -7,6 +7,9 @@ on:
     types:
       - completed
 
+env:
+  BUMP_COMMIT_MESSAGE: "chore(ci): bump packages"
+  
 jobs:
   printJob:    
     name: Print event
@@ -15,12 +18,10 @@ jobs:
     - name: Dump GitHub context
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
-        GITHUB_CONTEXT_WORKFLOW_DISPATCH: |
-          toJson(github.event.workflow_dispatch)
-        GITHUB_CONTEXT_WORKFLOW_RUN_CONCLUSION: |
-          toJson(github.event.workflow_run.conclusion == 'success')
-        GITHUB_CONTEXT_IS_BUMP_PACKAGES: |
-          startsWith(github.event.workflow_run.head_commit.message, 'chore(ci): bump packages')) }}          
+        GITHUB_CONTEXT_WORKFLOW_DISPATCH: ${{  toJson(github.event.workflow_dispatch) }}
+        GITHUB_CONTEXT_WORKFLOW_RUN_CONCLUSION: ${{ toJson(github.event.workflow_run.conclusion == 'success') }}
+        GITHUB_CONTEXT_IS_BUMP_PACKAGES: ${{ toJson(startsWith(github.event.workflow_run.head_commit.message, env.BUMP_COMMIT_MESSAGE)) }}
+        COMM_MESS: ${{ env.BUMP_COMMIT_MESSAGE }}
       run: |
         echo "$GITHUB_CONTEXT"
     - name: Debug conditions
@@ -33,6 +34,8 @@ jobs:
         echo ---
         echo GITHUB_CONTEXT_IS_BUMP_PACKAGES: "$GITHUB_CONTEXT_IS_BUMP_PACKAGES"
         echo ---
+        echo "$COMM_MESS"
+        echo ---
         echo "$GITHUB_CONTEXT"
   publish:
     if: |
@@ -40,7 +43,8 @@ jobs:
         github.event.workflow_run.conclusion == 'success' &&
         startsWith(
           github.event.workflow_run.head_commit.message, 'chore(ci): bump packages'
-        ))
+        )
+      )
 
     runs-on: ubuntu-latest
 
