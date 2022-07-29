@@ -15,7 +15,24 @@ jobs:
     - name: Dump GitHub context
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
+        GITHUB_CONTEXT_WORKFLOW_DISPATCH: |
+          toJson(github.event.workflow_dispatch)
+        GITHUB_CONTEXT_WORKFLOW_RUN_CONCLUSION: |
+          toJson(github.event.workflow_run.conclusion == 'success')
+        GITHUB_CONTEXT_IS_BUMP_PACKAGES: |
+          startsWith(github.event.workflow_run.head_commit.message, 'chore(ci): bump packages')) }}          
       run: |
+        echo "$GITHUB_CONTEXT"
+    - name: Debug conditions
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: |
+        echo GITHUB_CONTEXT_WORKFLOW_DISPATCH: "$GITHUB_CONTEXT_WORKFLOW_DISPATCH"
+        echo ---
+        echo GITHUB_CONTEXT_WORKFLOW_RUN_CONCLUSION: "$GITHUB_CONTEXT_WORKFLOW_RUN_CONCLUSION"
+        echo ---
+        echo GITHUB_CONTEXT_IS_BUMP_PACKAGES: "$GITHUB_CONTEXT_IS_BUMP_PACKAGES"
+        echo ---
         echo "$GITHUB_CONTEXT"
   publish:
     if: |
